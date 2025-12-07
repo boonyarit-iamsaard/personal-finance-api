@@ -1,0 +1,41 @@
+name: "personal-finance"
+
+services:
+  postgres:
+    container_name: "personal-finance-postgres"
+    image: "docker.io/postgres:15-alpine"
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      POSTGRES_DB: "${POSTGRES_DB:-personal-finance}"
+    ports:
+      - "5432:5432"
+    restart: "always"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - personal-finance-network
+    healthcheck:
+      test: pg_isready -U ${POSTGRES_USER:-postgres} -h localhost
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  adminer:
+    container_name: "personal-finance-adminer"
+    image: "docker.io/adminer:latest"
+    ports:
+      - "8090:8080"
+    restart: "always"
+    networks:
+      - personal-finance-network
+    environment:
+      ADMINER_DEFAULT_SERVER: "postgres"
+
+volumes:
+  pgdata:
+    name: "personal-finance-pgdata"
+
+networks:
+  personal-finance-network:
+    name: "personal-finance-network"

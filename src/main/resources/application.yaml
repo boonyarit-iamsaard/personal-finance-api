@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: Finance
+  datasource:
+    url: jdbc:postgresql://localhost:5432/personal-finance
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: true
