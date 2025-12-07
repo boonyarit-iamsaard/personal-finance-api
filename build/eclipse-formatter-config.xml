@@ -29,7 +29,7 @@
       value="common_lines" />
     <setting id="org.eclipse.jdt.core.formatter.insert_space_after_semicolon_in_for" value="insert" />
     <setting id="org.eclipse.jdt.core.formatter.align_with_spaces" value="false" />
-    <setting id="org.eclipse.jdt.core.formatter.continuation_indentation" value="2" />
+    <setting id="org.eclipse.jdt.core.formatter.continuation_indentation" value="1" />
     <setting id="org.eclipse.jdt.core.formatter.number_of_blank_lines_before_code_block" value="0" />
     <setting
       id="org.eclipse.jdt.core.formatter.insert_space_before_comma_in_switch_case_expressions"
@@ -155,7 +155,7 @@
     <setting id="org.eclipse.jdt.core.formatter.format_line_comment_starting_on_first_column"
       value="false" />
     <setting id="org.eclipse.jdt.core.formatter.parentheses_positions_in_annotation"
-      value="common_lines" />
+      value="separate_lines_if_wrapped" />
     <setting id="org.eclipse.jdt.core.formatter.insert_space_before_ellipsis" value="do not insert" />
     <setting id="org.eclipse.jdt.core.formatter.insert_space_before_semicolon_in_try_resources"
       value="do not insert" />

@@ -6,6 +6,7 @@
   "java.completion.importOrder": [
     "#", // static imports
     "java", // java.* packages
-    "" // all other imports
+    "", // all other imports
+    "me.boonyarit"
   ]
 }
