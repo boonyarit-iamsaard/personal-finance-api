@@ -8,6 +8,25 @@ Phase 4 adds advanced features to improve user experience and security. This inc
 
 ### 1. Create Refresh Token Entity
 
+#### Flyway Migration
+
+**File**: `src/main/resources/db/migration/V2__add_refresh_token.sql`
+
+```sql
+CREATE TABLE refresh_token_entity (
+    id BIGINT NOT NULL DEFAULT nextval('primary_key_seq'),
+    created_date TIMESTAMP(6),
+    last_modified_date TIMESTAMP(6),
+    token VARCHAR(255),
+    expiry_date TIMESTAMP(6),
+    revoked BOOLEAN NOT NULL,
+    user_id BIGINT,
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE refresh_token_entity ADD CONSTRAINT FK_REFRESH_TOKEN_ON_USER FOREIGN KEY (user_id) REFERENCES users (id);
+```
+
 #### RefreshTokenEntity
 
 **File**: `src/main/java/me/boonyarit/finance/entity/RefreshTokenEntity.java`

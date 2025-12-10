@@ -52,7 +52,7 @@ public enum AuthProvider {
 
 #### Update pom.xml
 
-Add the following dependencies to support JWT and OAuth2:
+Add the following dependencies to support JWT, OAuth2, OpenAPI, Flyway, and MapStruct:
 
 ```xml
 <!-- JWT Support -->
@@ -79,13 +79,43 @@ Add the following dependencies to support JWT and OAuth2:
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-oauth2-client</artifactId>
 </dependency>
+
+<!-- OpenAPI / Swagger -->
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>
+
+<!-- Database Migration -->
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-database-postgresql</artifactId>
+</dependency>
+
+<!-- MapStruct -->
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct</artifactId>
+    <version>1.5.5.Final</version>
+</dependency>
+<dependency>
+    <groupId>org.mapstruct</groupId>
+    <artifactId>mapstruct-processor</artifactId>
+    <version>1.5.5.Final</version>
+    <scope>provided</scope>
+</dependency>
 ```
 
 ### 3. Update Application Configuration
 
 #### application.yaml
 
-Add JWT configuration properties:
+Add JWT configuration properties and enable Flyway:
 
 ```yaml
 spring:
@@ -98,16 +128,18 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate # Changed from update to validate for Flyway
     open-in-view: false
     show-sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
 # JWT Configuration
 app:
   jwt:
     secret: ${JWT_SECRET:mySecretKey123456789012345678901234567890}
     expiration: 900000 # 15 minutes in milliseconds
-
 
 # OAuth2 Configuration (will be configured in Phase 3)
 # spring:
@@ -126,18 +158,45 @@ Create the following package structure under `me.boonyarit.finance`:
 
 ```text
 src/main/java/me/boonyarit/finance/
-├── config/          # Security configuration
-├── controller/      # REST controllers
+├── config/         # Security configuration
+├── controller/     # REST controllers
 ├── dto/            # Data Transfer Objects
 │   ├── request/    # Request DTOs
 │   └── response/   # Response DTOs
 ├── exception/      # Custom exceptions
+├── mapper/         # MapStruct mappers
 ├── repository/     # JPA repositories
 ├── security/       # Security-related utilities
 └── service/        # Business logic
 ```
 
-### 5. Create README for Authentication
+### 5. Create Initial Migration
+
+Create the initial Flyway migration script:
+
+**File**: `src/main/resources/db/migration/V1__init_schema.sql`
+
+```sql
+CREATE SEQUENCE primary_key_seq START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE users (
+    id BIGINT NOT NULL DEFAULT nextval('primary_key_seq'),
+    created_date TIMESTAMP(6),
+    last_modified_date TIMESTAMP(6),
+    email VARCHAR(255) NOT NULL,
+    password VARCHAR(255),
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    role VARCHAR(255) NOT NULL,
+    provider VARCHAR(255) NOT NULL,
+    provider_id VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+ALTER TABLE users ADD CONSTRAINT uc_users_email UNIQUE (email);
+```
+
+### 6. Create README for Authentication
 
 Create a documentation file that will be updated throughout the phases:
 

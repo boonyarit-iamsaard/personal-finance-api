@@ -62,7 +62,33 @@ public class RegisterRequest {
 }
 ```
 
-### 2. Create Response DTO
+### 2. Create User Mapper
+
+#### UserMapper Interface
+
+**File**: `src/main/java/me/boonyarit/finance/mapper/UserMapper.java`
+
+```java
+package me.boonyarit.finance.mapper;
+
+import me.boonyarit.finance.dto.request.RegisterRequest;
+import me.boonyarit.finance.dto.response.AuthenticationResponse;
+import me.boonyarit.finance.entity.UserEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+
+    @Mapping(target = "role", constant = "USER")
+    @Mapping(target = "provider", constant = "LOCAL")
+    UserEntity toEntity(RegisterRequest request);
+
+    AuthenticationResponse toAuthResponse(String token);
+}
+```
+
+### 3. Implement Authentication Service
 
 #### Authentication Response DTO
 
