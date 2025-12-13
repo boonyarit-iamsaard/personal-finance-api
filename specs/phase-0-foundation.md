@@ -6,7 +6,7 @@ Phase 0 focuses on preparing the project foundation for implementing the authent
 
 ## Tasks
 
-### 1. Fix Enum Typos
+### 1. ✅ Fix Enum Typos
 
 #### Role Enum
 
@@ -258,13 +258,13 @@ This document tracks the implementation of the authentication system.
    ./mvnw compile
    ```
 
-1. **Test Check**: Run existing tests
+2. **Test Check**: Run existing tests
 
    ```bash
    ./mvnw test
    ```
 
-1. **Dependency Check**: Verify new dependencies are resolved
+3. **Dependency Check**: Verify new dependencies are resolved
 
    ```bash
    ./mvnw dependency:tree | grep -E "(jjwt|oauth2)"
