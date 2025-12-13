@@ -48,7 +48,7 @@ public enum AuthProvider {
 }
 ```
 
-### 2. Add Dependencies
+### 2. ✅ Add Dependencies
 
 #### Update pom.xml
 
@@ -111,7 +111,7 @@ Add the following dependencies to support JWT, OAuth2, OpenAPI, Flyway, and MapS
 </dependency>
 ```
 
-### 3. Update Application Configuration
+### 3. ✅ Update Application Configuration
 
 #### application.yaml
 
