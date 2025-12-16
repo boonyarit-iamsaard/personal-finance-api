@@ -4,7 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Spring Boot-based REST API for personal finance management built with Java 21 and PostgreSQL. The project follows a standard Maven structure with entity-driven design using Spring Data JPA.
+This is a Spring Boot-based REST API for personal finance management built with Java 21 and PostgreSQL. The project
+follows a standard Maven structure with entity-driven design using Spring Data JPA.
 
 ## Common Development Commands
 
@@ -28,19 +29,6 @@ This is a Spring Boot-based REST API for personal finance management built with 
 
 # Run tests with coverage
 ./mvnw test jacoco:report
-```
-
-### Code Formatting (Required before commits)
-
-```bash
-# Apply code formatting
-./mvnw spotless:apply
-
-# Check if code is properly formatted
-./mvnw spotless:check
-
-# Format and build in one command
-./mvnw spotless:apply compile
 ```
 
 ### Database Setup
@@ -70,15 +58,15 @@ docker compose down
 
 ### Package Structure
 
-```
+```text
 me.boonyarit.finance/
-├── Application.java           # Spring Boot entry point
-├── entity/                   # JPA entities
-│   ├── BaseEntity.java      # Abstract base with ID and audit fields
-│   └── UserEntity.java      # User entity implementing UserDetails
-└── enumeration/             # Enum definitions
-    ├── Role.java            # User roles (ADIMIN, USER) - Note: typo exists
-    └── AuthProvider.java    # Authentication providers (LOCAL, GOOGLE)
+├── Application.java            # Spring Boot entry point
+├── entity/                     # JPA entities
+│   ├── BaseEntity.java         # Abstract base with ID and audit fields
+│   └── UserEntity.java         # User entity implementing UserDetails
+└── enumeration/                # Enum definitions
+    ├── Role.java               # User roles (ADIMIN, USER) - Note: typo exists
+    └── AuthProvider.java       # Authentication providers (LOCAL, GOOGLE)
 ```
 
 ### Database Configuration
@@ -87,7 +75,7 @@ me.boonyarit.finance/
 - **Name**: personal-finance
 - **Default credentials**: postgres/postgres (override with POSTGRES_USER and POSTGRES_PASSWORD env vars)
 - **Schema generation**: Hibernate DDL auto-update enabled
-- **Database admin**: Adminer available at http://localhost:8090
+- **Database admin**: Adminer available at <http://localhost:8090>
 
 ### Security Implementation
 
@@ -144,7 +132,7 @@ This project uses [markdownlint-cli](https://github.com/igorshubovych/markdownli
 
 #### Markdown Requirements
 
-- All fenced code blocks must specify language (e.g., `java, `yaml, ```text)
+- All fenced code blocks must specify language (e.g., `java`, `yaml`, `text`)
 - Tables must be properly formatted with aligned pipes
 - No trailing punctuation in headings
 - Headings and lists should be surrounded by blank lines
@@ -183,13 +171,3 @@ All entities extend BaseEntity which provides:
 - JPA open-in-view disabled for performance
 - SQL logging enabled in development
 - Hibernate DDL auto-update enabled (consider changing to validate in production)
-
-### Known Issues
-
-- Role enum contains typo: "ADIMIN" instead of "ADMIN" in `src/main/java/me/boonyarit/finance/enumeration/Role.java`
-
-## IDE Integration
-
-- VS Code configuration in `.vscode/settings.json`
-- IntelliJ IDEA configuration in `.idea/`
-- Both IDEs configured to use Eclipse formatter for consistency

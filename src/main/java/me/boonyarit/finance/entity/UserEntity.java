@@ -3,23 +3,13 @@ package me.boonyarit.finance.entity;
 import java.util.Collection;
 import java.util.Collections;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import jakarta.persistence.*;
+import lombok.*;
+import me.boonyarit.finance.enumeration.AuthProvider;
+import me.boonyarit.finance.enumeration.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import me.boonyarit.finance.enumeration.AuthProvider;
-import me.boonyarit.finance.enumeration.Role;
 
 @Getter
 @Setter
