@@ -82,6 +82,16 @@ All entities extend BaseEntity with @Id sequence starting from 1000, createdAt/u
 - Adminer available at <http://localhost:8090>
 - Hibernate DDL auto-update enabled (consider changing to validate in production)
 
+## Environment Variables
+
+- Copy `.env.example` to `.env` and configure your environment variables
+- Required: `JWT_SECRET` (generate with `openssl rand -base64 32`)
+- Optional: `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
+- **Automatic loading**: Spring Boot automatically loads `.env` from project root
+- **Development workflow**: `./mvnw spring-boot:run` (no manual environment setup needed)
+- Never commit `.env` file with real secrets - it's already in .gitignore
+- See `.env.example` for detailed setup instructions and security guidelines
+
 ## Markdown Requirements
 
 - All fenced code blocks must specify language (e.g., `java`, `yaml`, `text`)

@@ -1,6 +1,8 @@
 spring:
   application:
     name: Finance
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: jdbc:postgresql://localhost:5432/personal-finance
     username: ${POSTGRES_USER:postgres}
@@ -15,7 +17,7 @@ spring:
 security:
   jwt:
     # Generate a secure secret with: openssl rand -base64 32
-    secret: ${JWT_SECRET:generate-secure-jwt-secret-with-openssl-rand-base64-32}
+    secret: ${JWT_SECRET}
     expiration-ms: 900000 # 15 minutes in milliseconds
 
 # Google OAuth2 configuration (for future implementation)
