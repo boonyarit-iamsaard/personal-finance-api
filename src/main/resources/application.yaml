@@ -24,6 +24,7 @@ security:
     # Generate a secure secret with: openssl rand -base64 32
     secret: ${JWT_SECRET}
     expiration-ms: 900000 # 15 minutes in milliseconds
+    refresh-expiration-ms: 604800000 # 7 days in milliseconds
 
 # Google OAuth2 configuration (for future implementation)
 # Uncomment and configure when ready to implement Google OAuth
