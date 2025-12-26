@@ -66,7 +66,7 @@ class AuthenticationServiceTest {
 
         when(passwordEncoder.encode(TEST_PASSWORD)).thenReturn(TEST_ENCODED_PASSWORD);
         when(jwtService.generateToken(rawUser, AuthProvider.LOCAL)).thenReturn(TEST_TOKEN);
-        
+
         RefreshTokenEntity refreshToken = createRefreshTokenEntity(rawUser);
         when(refreshTokenService.createRefreshToken(rawUser)).thenReturn(refreshToken);
 
@@ -118,10 +118,10 @@ class AuthenticationServiceTest {
             .thenReturn(authenticationMock);
         when(jwtService.generateToken(authenticatedUser, AuthProvider.LOCAL))
             .thenReturn(TEST_TOKEN);
-            
+
         RefreshTokenEntity refreshToken = createRefreshTokenEntity(authenticatedUser);
         when(refreshTokenService.createRefreshToken(authenticatedUser)).thenReturn(refreshToken);
-        
+
         when(userMapper.toAuthenticationResponse(authenticatedUser, TEST_TOKEN, TEST_REFRESH_TOKEN))
             .thenReturn(createAuthenticationResponse());
 

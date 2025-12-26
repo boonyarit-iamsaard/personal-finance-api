@@ -22,30 +22,10 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenProperties refreshTokenProperties;
 
-    @Transactional(readOnly = true)
-    public Optional<RefreshTokenEntity> findByToken(String token) {
-        return refreshTokenRepository.findByToken(token);
-    }
-
     @Transactional
     public RefreshTokenEntity createRefreshToken(UserEntity user) {
-        refreshTokenRepository.revokeAllValidTokensByUser(user);
-        return generateRefreshToken(user);
-    }
-
-    @Transactional
-    public RefreshTokenEntity verifyExpiration(RefreshTokenEntity token) {
-        if (token.getExpiryDate().isBefore(now())) {
-            refreshTokenRepository.delete(token);
-            throw new RefreshTokenException(token.getToken(), "Refresh token was expired. Please make a new signin request");
-        }
-        return token;
-    }
-
-    @Transactional
-    public void revokeToken(RefreshTokenEntity token) {
-        token.setRevoked(true);
-        refreshTokenRepository.save(token);
+        revokeAllValidTokensByUser(user);
+        return generateAndSaveNewToken(user);
     }
 
     @Transactional
@@ -57,19 +37,46 @@ public class RefreshTokenService {
     public RefreshTokenEntity refreshToken(String tokenStr) {
         RefreshTokenEntity token = findByToken(tokenStr)
             .orElseThrow(() -> new RefreshTokenException(tokenStr, "Refresh token not found"));
-            
+
         RefreshTokenEntity verifiedToken = verifyExpiration(token);
-        
+
         if (verifiedToken.isRevoked()) {
             throw new RefreshTokenException(tokenStr, "Refresh token has been revoked");
         }
-        
+
         UserEntity user = verifiedToken.getUser();
         revokeToken(verifiedToken);
-        return createRefreshToken(user);
+        revokeAllValidTokensByUser(user);
+        return generateAndSaveNewToken(user);
     }
 
-    private RefreshTokenEntity generateRefreshToken(UserEntity user) {
+    @Transactional
+    public void cleanupExpiredTokens() {
+        refreshTokenRepository.deleteAllExpiredTokens(now());
+    }
+
+    private Optional<RefreshTokenEntity> findByToken(String token) {
+        return refreshTokenRepository.findByToken(token);
+    }
+
+    private RefreshTokenEntity verifyExpiration(RefreshTokenEntity token) {
+        if (token.getExpiryDate().isBefore(now())) {
+            refreshTokenRepository.delete(token);
+            throw new RefreshTokenException(token.getToken(), "Refresh token was expired. Please make a new login request");
+        }
+        return token;
+    }
+
+    private void revokeToken(RefreshTokenEntity token) {
+        token.setRevoked(true);
+        refreshTokenRepository.save(token);
+    }
+
+    private void revokeAllValidTokensByUser(UserEntity user) {
+        refreshTokenRepository.revokeAllValidTokensByUser(user);
+    }
+
+    private RefreshTokenEntity generateAndSaveNewToken(UserEntity user) {
         RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
             .user(user)
             .token(UUID.randomUUID().toString())
@@ -78,10 +85,5 @@ public class RefreshTokenService {
             .build();
 
         return refreshTokenRepository.save(refreshToken);
-    }
-
-    @Transactional
-    public void cleanupExpiredTokens() {
-        refreshTokenRepository.deleteAllExpiredTokens(now());
     }
 }

@@ -1,8 +1,10 @@
 package me.boonyarit.finance.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+@Getter
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
 public class RefreshTokenException extends RuntimeException {
 
@@ -16,9 +18,5 @@ public class RefreshTokenException extends RuntimeException {
     public RefreshTokenException(String token, String message) {
         super(message);
         this.token = token;
-    }
-
-    public String getToken() {
-        return token;
     }
 }
