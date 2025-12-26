@@ -1,14 +1,15 @@
 package me.boonyarit.finance.service;
 
 import lombok.RequiredArgsConstructor;
+import me.boonyarit.finance.config.RefreshTokenProperties;
 import me.boonyarit.finance.entity.RefreshTokenEntity;
 import me.boonyarit.finance.entity.UserEntity;
 import me.boonyarit.finance.exception.RefreshTokenException;
 import me.boonyarit.finance.repository.RefreshTokenRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.time.LocalDateTime.now;
@@ -18,44 +19,69 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    @Value("${security.jwt.refresh-expiration-ms}")
-    private Long refreshTokenExpirationMs;
-
     private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenProperties refreshTokenProperties;
 
+    @Transactional(readOnly = true)
+    public Optional<RefreshTokenEntity> findByToken(String token) {
+        return refreshTokenRepository.findByToken(token);
+    }
+
+    @Transactional
     public RefreshTokenEntity createRefreshToken(UserEntity user) {
         refreshTokenRepository.revokeAllValidTokensByUser(user);
-
-        RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
-                .user(user)
-                .token(UUID.randomUUID().toString())
-                .expiryDate(now().plus(refreshTokenExpirationMs, MILLIS))
-                .build();
-
-        return refreshTokenRepository.save(refreshToken);
+        return generateRefreshToken(user);
     }
 
-    public RefreshTokenEntity findByToken(String token) {
-        return refreshTokenRepository.findByToken(token).orElseThrow(() -> new RefreshTokenException("Refresh token not found"));
-    }
-
+    @Transactional
     public RefreshTokenEntity verifyExpiration(RefreshTokenEntity token) {
-        if (token.getExpiryDate().isBefore(now()) || token.isRevoked()) {
+        if (token.getExpiryDate().isBefore(now())) {
             refreshTokenRepository.delete(token);
-            throw new RefreshTokenException("Refresh token has expired or revoked. Please login again.");
+            throw new RefreshTokenException(token.getToken(), "Refresh token was expired. Please make a new signin request");
         }
-
         return token;
     }
 
     @Transactional
-    public RefreshTokenEntity refreshToken(String requestRefreshToken) {
-        RefreshTokenEntity token = findByToken(requestRefreshToken);
+    public void revokeToken(RefreshTokenEntity token) {
+        token.setRevoked(true);
+        refreshTokenRepository.save(token);
+    }
+
+    @Transactional
+    public void revokeTokenByString(String token) {
+        findByToken(token).ifPresent(this::revokeToken);
+    }
+
+    @Transactional
+    public RefreshTokenEntity refreshToken(String tokenStr) {
+        RefreshTokenEntity token = findByToken(tokenStr)
+            .orElseThrow(() -> new RefreshTokenException(tokenStr, "Refresh token not found"));
+            
         RefreshTokenEntity verifiedToken = verifyExpiration(token);
+        
+        if (verifiedToken.isRevoked()) {
+            throw new RefreshTokenException(tokenStr, "Refresh token has been revoked");
+        }
+        
+        UserEntity user = verifiedToken.getUser();
+        revokeToken(verifiedToken);
+        return createRefreshToken(user);
+    }
 
-        verifiedToken.setRevoked(true);
-        refreshTokenRepository.save(verifiedToken);
+    private RefreshTokenEntity generateRefreshToken(UserEntity user) {
+        RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
+            .user(user)
+            .token(UUID.randomUUID().toString())
+            .expiryDate(now().plus(refreshTokenProperties.getRefreshExpirationMs(), MILLIS))
+            .revoked(false)
+            .build();
 
-        return createRefreshToken(verifiedToken.getUser());
+        return refreshTokenRepository.save(refreshToken);
+    }
+
+    @Transactional
+    public void cleanupExpiredTokens() {
+        refreshTokenRepository.deleteAllExpiredTokens(now());
     }
 }

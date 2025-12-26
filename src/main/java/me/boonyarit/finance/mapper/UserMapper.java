@@ -14,5 +14,6 @@ public interface UserMapper {
     UserEntity toEntity(RegisterRequest registerRequest);
 
     @Mapping(target = "token", source = "token")
-    AuthenticationResponse toAuthenticationResponse(UserEntity user, String token);
+    @Mapping(target = "refreshToken", source = "refreshToken")
+    AuthenticationResponse toAuthenticationResponse(UserEntity user, String token, String refreshToken);
 }

@@ -25,6 +25,7 @@ security:
     secret: ${JWT_SECRET}
     expiration-ms: 900000 # 15 minutes in milliseconds
     refresh-expiration-ms: 604800000 # 7 days in milliseconds
+    repeat-interval-ms: 3600000 # 1 hour in milliseconds
 
 # Google OAuth2 configuration (for future implementation)
 # Uncomment and configure when ready to implement Google OAuth

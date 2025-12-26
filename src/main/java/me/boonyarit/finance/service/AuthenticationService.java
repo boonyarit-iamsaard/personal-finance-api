@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.boonyarit.finance.dto.request.AuthenticationRequest;
 import me.boonyarit.finance.dto.request.RegisterRequest;
 import me.boonyarit.finance.dto.response.AuthenticationResponse;
+import me.boonyarit.finance.entity.RefreshTokenEntity;
 import me.boonyarit.finance.entity.UserEntity;
 import me.boonyarit.finance.exception.UserAlreadyExistsException;
 import me.boonyarit.finance.mapper.UserMapper;
@@ -24,6 +25,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
@@ -37,8 +39,9 @@ public class AuthenticationService {
         userRepository.save(user);
 
         String token = jwtService.generateToken(user, user.getProvider());
+        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return userMapper.toAuthenticationResponse(user, token);
+        return userMapper.toAuthenticationResponse(user, token, refreshToken.getToken());
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -52,7 +55,21 @@ public class AuthenticationService {
         UserEntity user = (UserEntity) authentication.getPrincipal();
 
         String token = jwtService.generateToken(user, user.getProvider());
+        RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(user);
 
-        return userMapper.toAuthenticationResponse(user, token);
+        return userMapper.toAuthenticationResponse(user, token, refreshToken.getToken());
+    }
+
+    public AuthenticationResponse refreshToken(String refreshToken) {
+        RefreshTokenEntity token = refreshTokenService.refreshToken(refreshToken);
+        UserEntity user = token.getUser();
+
+        String newToken = jwtService.generateToken(user, user.getProvider());
+
+        return userMapper.toAuthenticationResponse(user, newToken, token.getToken());
+    }
+
+    public void logout(String refreshToken) {
+        refreshTokenService.revokeTokenByString(refreshToken);
     }
 }

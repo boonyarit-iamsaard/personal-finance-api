@@ -3,6 +3,7 @@ package me.boonyarit.finance.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import me.boonyarit.finance.dto.request.AuthenticationRequest;
+import me.boonyarit.finance.dto.request.RefreshTokenRequest;
 import me.boonyarit.finance.dto.request.RegisterRequest;
 import me.boonyarit.finance.dto.response.AuthenticationResponse;
 import me.boonyarit.finance.service.AuthenticationService;
@@ -30,10 +31,15 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+        AuthenticationResponse response = authenticationService.refreshToken(request.refreshToken());
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        // For JWT-based authentication, logout can be handled on the client side by deleting the token.
-        // This endpoint is provided for completeness.
+    public ResponseEntity<Void> logout(@RequestBody String refreshToken) {
+        authenticationService.logout(refreshToken);
         return ResponseEntity.noContent().build();
     }
 }

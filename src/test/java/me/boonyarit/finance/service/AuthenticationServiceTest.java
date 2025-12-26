@@ -3,6 +3,7 @@ package me.boonyarit.finance.service;
 import me.boonyarit.finance.dto.request.AuthenticationRequest;
 import me.boonyarit.finance.dto.request.RegisterRequest;
 import me.boonyarit.finance.dto.response.AuthenticationResponse;
+import me.boonyarit.finance.entity.RefreshTokenEntity;
 import me.boonyarit.finance.entity.UserEntity;
 import me.boonyarit.finance.enumeration.AuthProvider;
 import me.boonyarit.finance.enumeration.Role;
@@ -35,6 +36,7 @@ class AuthenticationServiceTest {
     private static final String TEST_ENCODED_PASSWORD = "encoded_SecurePassword123";
     private static final String TEST_INVALID_PASSWORD = "invalid_SecurePassword123";
     private static final String TEST_TOKEN = "TestJwtToken";
+    private static final String TEST_REFRESH_TOKEN = "TestRefreshToken";
 
     @Mock
     private UserRepository userRepository;
@@ -46,6 +48,8 @@ class AuthenticationServiceTest {
     private JwtService jwtService;
     @Mock
     private AuthenticationManager authenticationManager;
+    @Mock
+    private RefreshTokenService refreshTokenService;
 
     @InjectMocks
     private AuthenticationService authenticationService;
@@ -62,9 +66,12 @@ class AuthenticationServiceTest {
 
         when(passwordEncoder.encode(TEST_PASSWORD)).thenReturn(TEST_ENCODED_PASSWORD);
         when(jwtService.generateToken(rawUser, AuthProvider.LOCAL)).thenReturn(TEST_TOKEN);
+        
+        RefreshTokenEntity refreshToken = createRefreshTokenEntity(rawUser);
+        when(refreshTokenService.createRefreshToken(rawUser)).thenReturn(refreshToken);
 
         when(userMapper.toEntity(request)).thenReturn(rawUser);
-        when(userMapper.toAuthenticationResponse(rawUser, TEST_TOKEN)).thenReturn(expectedAuthenticationResponse);
+        when(userMapper.toAuthenticationResponse(rawUser, TEST_TOKEN, TEST_REFRESH_TOKEN)).thenReturn(expectedAuthenticationResponse);
 
         AuthenticationResponse actualAuthenticationResponse = authenticationService.register(request);
 
@@ -111,7 +118,11 @@ class AuthenticationServiceTest {
             .thenReturn(authenticationMock);
         when(jwtService.generateToken(authenticatedUser, AuthProvider.LOCAL))
             .thenReturn(TEST_TOKEN);
-        when(userMapper.toAuthenticationResponse(authenticatedUser, TEST_TOKEN))
+            
+        RefreshTokenEntity refreshToken = createRefreshTokenEntity(authenticatedUser);
+        when(refreshTokenService.createRefreshToken(authenticatedUser)).thenReturn(refreshToken);
+        
+        when(userMapper.toAuthenticationResponse(authenticatedUser, TEST_TOKEN, TEST_REFRESH_TOKEN))
             .thenReturn(createAuthenticationResponse());
 
         AuthenticationResponse actualAuthenticationResponse = authenticationService.authenticate(request);
@@ -162,10 +173,18 @@ class AuthenticationServiceTest {
     private AuthenticationResponse createAuthenticationResponse() {
         return new AuthenticationResponse(
             TEST_TOKEN,
+            TEST_REFRESH_TOKEN,
             TEST_EMAIL,
             TEST_FIRST_NAME,
             TEST_LAST_NAME,
             AuthProvider.LOCAL.name()
         );
+    }
+
+    private RefreshTokenEntity createRefreshTokenEntity(UserEntity user) {
+        return RefreshTokenEntity.builder()
+            .token(TEST_REFRESH_TOKEN)
+            .user(user)
+            .build();
     }
 }

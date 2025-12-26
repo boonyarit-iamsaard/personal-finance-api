@@ -141,6 +141,7 @@ app:
     secret: ${JWT_SECRET:mySecretKey123456789012345678901234567890}
     expiration: 900000 # 15 minutes in milliseconds
 
+
 # OAuth2 Configuration (will be configured in Phase 3)
 # spring:
 #   security:
