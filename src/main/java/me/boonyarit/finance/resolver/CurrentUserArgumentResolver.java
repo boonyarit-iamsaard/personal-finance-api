@@ -1,12 +1,13 @@
 package me.boonyarit.finance.resolver;
 
 import me.boonyarit.finance.annotation.CurrentUser;
-import me.boonyarit.finance.entity.UserEntity;
+import me.boonyarit.finance.exception.AuthenticationException;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -18,7 +19,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterAnnotation(CurrentUser.class) != null &&
-            UserEntity.class.isAssignableFrom(parameter.getParameterType());
+            UserDetails.class.isAssignableFrom(parameter.getParameterType());
     }
 
     @Override
@@ -32,10 +33,10 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
         if (authentication != null &&
             authentication.isAuthenticated() &&
-            authentication.getPrincipal() instanceof UserEntity user) {
+            authentication.getPrincipal() instanceof UserDetails user) {
             return user;
         }
 
-        throw new IllegalArgumentException("User is not authenticated");
+        throw new AuthenticationException("User is not authenticated");
     }
 }

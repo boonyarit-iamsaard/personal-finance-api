@@ -4,14 +4,17 @@ import lombok.RequiredArgsConstructor;
 import me.boonyarit.finance.dto.request.AuthenticationRequest;
 import me.boonyarit.finance.dto.request.RegisterRequest;
 import me.boonyarit.finance.dto.response.AuthenticationResponse;
+import me.boonyarit.finance.dto.response.UserResponse;
 import me.boonyarit.finance.entity.RefreshTokenEntity;
 import me.boonyarit.finance.entity.UserEntity;
+import me.boonyarit.finance.exception.AuthenticationException;
 import me.boonyarit.finance.exception.UserAlreadyExistsException;
 import me.boonyarit.finance.mapper.UserMapper;
 import me.boonyarit.finance.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -71,5 +74,13 @@ public class AuthenticationService {
 
     public void logout(String refreshToken) {
         refreshTokenService.revokeTokenByString(refreshToken);
+    }
+
+    public UserResponse getCurrentUser(UserDetails currentUser) {
+        String email = currentUser.getUsername();
+        UserEntity user = userRepository.findByEmailIgnoreCase(email)
+            .orElseThrow(() -> new AuthenticationException("User not found"));
+
+        return userMapper.toUserResponse(user);
     }
 }

@@ -1,6 +1,7 @@
 package me.boonyarit.finance.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -14,11 +15,11 @@ public record ErrorResponse(
     Map<String, String> validationErrors
 ) {
 
-    public ErrorResponse(int status, String error, String message) {
-        this(LocalDateTime.now(), status, error, message, null);
+    public ErrorResponse(HttpStatus status, String message) {
+        this(LocalDateTime.now(), status.value(), status.getReasonPhrase(), message, null);
     }
 
-    public ErrorResponse(int status, String error, String message, Map<String, String> fieldErrors) {
-        this(LocalDateTime.now(), status, error, message, fieldErrors);
+    public ErrorResponse(HttpStatus status, String message, Map<String, String> fieldErrors) {
+        this(LocalDateTime.now(), status.value(), status.getReasonPhrase(), message, fieldErrors);
     }
 }

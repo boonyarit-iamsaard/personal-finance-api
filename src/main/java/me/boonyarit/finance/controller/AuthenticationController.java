@@ -2,19 +2,22 @@ package me.boonyarit.finance.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import me.boonyarit.finance.annotation.CurrentUser;
 import me.boonyarit.finance.dto.request.AuthenticationRequest;
 import me.boonyarit.finance.dto.request.RefreshTokenRequest;
+import me.boonyarit.finance.dto.request.LogoutRequest;
 import me.boonyarit.finance.dto.request.RegisterRequest;
 import me.boonyarit.finance.dto.response.AuthenticationResponse;
+import me.boonyarit.finance.dto.response.UserResponse;
 import me.boonyarit.finance.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "${app.cors.allowed-origins}", allowCredentials = "${app.cors.allow-credentials}")
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
@@ -38,8 +41,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody String refreshToken) {
-        authenticationService.logout(refreshToken);
+    public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest request) {
+        authenticationService.logout(request.refreshToken());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser(@CurrentUser UserDetails currentUser) {
+        UserResponse response = authenticationService.getCurrentUser(currentUser);
+        return ResponseEntity.ok(response);
     }
 }
