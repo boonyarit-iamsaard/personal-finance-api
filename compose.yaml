@@ -21,16 +21,19 @@ services:
       timeout: 5s
       retries: 10
 
-  adminer:
-    container_name: "personal-finance-adminer"
-    image: "docker.io/adminer:latest"
+  redis:
+    container_name: "personal-finance-redis"
+    image: "docker.io/redis:7-alpine"
     ports:
-      - "8090:8080"
+      - "6379:6379"
     restart: "always"
     networks:
       - personal-finance-network
-    environment:
-      ADMINER_DEFAULT_SERVER: "postgres"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   pgdata:
