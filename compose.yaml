@@ -21,20 +21,6 @@ services:
       timeout: 5s
       retries: 10
 
-  redis:
-    container_name: "personal-finance-redis"
-    image: "docker.io/redis:7-alpine"
-    ports:
-      - "6379:6379"
-    restart: "always"
-    networks:
-      - personal-finance-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
 volumes:
   pgdata:
     name: "personal-finance-pgdata"
